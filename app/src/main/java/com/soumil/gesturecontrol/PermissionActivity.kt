@@ -6,8 +6,18 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -18,7 +28,6 @@ class PermissionActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPermissionBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
             startActivity(Intent(this, MainActivity::class.java))
@@ -29,8 +38,23 @@ class PermissionActivity : AppCompatActivity() {
         binding = ActivityPermissionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.button.setOnClickListener {
-            getCameraPermission()
+        binding.composeView.setContent {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 30.dp),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally,
+
+            ) {
+                Button(
+                    onClick = { getCameraPermission() },
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary_light)),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                ) {
+                    Text(text = "Allow Camera Permission")
+                }
+            }
         }
     }
 
