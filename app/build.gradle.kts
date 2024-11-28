@@ -4,12 +4,14 @@ plugins {
 }
 
 android {
+
     namespace = "com.soumil.gesturecontrol"
     compileSdk = 34
 
     defaultConfig {
         applicationId = "com.soumil.gesturecontrol"
         minSdk = 29
+        //noinspection OldTargetApi
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -71,4 +73,9 @@ dependencies {
     implementation("androidx.camera:camera-video:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
     implementation("androidx.camera:camera-extensions:1.3.4")
+
+//    Mediapipe dependencies
+//    implementation("com.google.mediapipe:solution-core:0.10.15")
+//    implementation("com.google.mediapipe:hands:0.10.15")
+//    implementation("com.google.mediapipe:tasks-vision:0.20230731")
 }

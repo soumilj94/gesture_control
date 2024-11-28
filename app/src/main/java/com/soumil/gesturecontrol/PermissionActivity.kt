@@ -1,10 +1,12 @@
 package com.soumil.gesturecontrol
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +50,13 @@ class PermissionActivity : AppCompatActivity() {
 
             ) {
                 Button(
+                    onClick = { getBatteryOptimization() },
+                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary_light)),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                ) {
+                    Text(text = "Allow background usage")
+                }
+                Button(
                     onClick = { getCameraPermission() },
                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = R.color.primary_light)),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
@@ -55,6 +64,22 @@ class PermissionActivity : AppCompatActivity() {
                     Text(text = "Allow Camera Permission")
                 }
             }
+        }
+    }
+
+    @SuppressLint("BatteryLife")
+    private fun getBatteryOptimization() {
+        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+        val packageName = packageName
+
+        if (!powerManager.isIgnoringBatteryOptimizations(packageName)){
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            startActivity(intent)
+        }
+        else{
+            Snackbar.make(binding.root, "Already excluded from Battery Optimization", Snackbar.LENGTH_SHORT).show()
         }
     }
 

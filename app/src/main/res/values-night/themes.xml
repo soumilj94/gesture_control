@@ -2,7 +2,23 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.GestureControl" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/primary_light</item>
+        <item name="materialAlertDialogBodyTextStyle">@color/primary_light</item>
         <item name="android:statusBarColor">@color/black</item>
+    </style>
+
+    <style name="Theme.GestureControl" parent="Base.Theme.GestureControl" />
+
+    <style name="Button" parent="Widget.Material3.Button.ElevatedButton">
+        <item name="android:backgroundTint">@android:color/holo_blue_dark</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="MaterialAlertDialog" parent="MaterialAlertDialog.Material3">
+        <item name="colorPrimary">@color/primary_light</item>
+    </style>
+    
+    <style name="MaterialSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="thumbTint">@color/white</item>
     </style>
 </resources>
