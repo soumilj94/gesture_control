@@ -18,20 +18,30 @@ class AccelerometerSensorEvent(
     private var isMediaActionTrigger = false
     private var isVolumeActionTrigger = false
 
+    private var sideSensitivity = 5
+    private var updownSensitivity = 4
+
+    fun updateSensitivity(side: Int, upDown: Int){
+        sideSensitivity = side
+        updownSensitivity = upDown
+    }
+
     @SuppressLint("SetTextI18n")
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER){
             val sides = event.values[0]
             val upDown = event.values[1]
-            binding.accelerometer.text = "vertical ${upDown.toInt()}\n horizontal ${sides.toInt()}"
+
+            binding.horizontalValue.text = "${sides.toInt()}"
+            binding.verticalValue.text = "${upDown.toInt()}"
 
             if (!isMediaActionTrigger){
                 when{
-                    sides < -5 ->{
+                    sides < -sideSensitivity ->{
                         sendMediaKeyEvent(android.view.KeyEvent.KEYCODE_MEDIA_NEXT)
                         triggerMediaActionWithDelay()
                     }
-                    sides > 5 ->{
+                    sides > sideSensitivity ->{
                         sendMediaKeyEvent(android.view.KeyEvent.KEYCODE_MEDIA_PREVIOUS)
                         triggerMediaActionWithDelay()
                     }
@@ -39,10 +49,10 @@ class AccelerometerSensorEvent(
             }
             if (!isVolumeActionTrigger){
                 when{
-                    upDown < -4 ->{
+                    upDown < -updownSensitivity ->{
                         adjustVolumeWithDelay(AudioManager.ADJUST_RAISE)
                     }
-                    upDown > 4 ->{
+                    upDown > updownSensitivity ->{
                         adjustVolumeWithDelay(AudioManager.ADJUST_LOWER)
                     }
                 }

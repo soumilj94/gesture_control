@@ -6,6 +6,7 @@ import android.hardware.SensorManager
 import android.media.AudioManager
 import android.os.Bundle
 import android.view.KeyEvent
+import android.widget.SeekBar
 import androidx.activity.ComponentActivity
 import com.soumil.gesturecontrol.databinding.ActivityMainBinding
 import com.soumil.gesturecontrol.gestures.AccelerometerSensorEvent
@@ -51,6 +52,44 @@ class MainActivity : ComponentActivity() {
             accelerometerSensor,
             SensorManager.SENSOR_DELAY_GAME
         )
+
+        binding.sensorSensitivity.apply {
+            max = 2
+            progress = 1
+
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val sideSensitivity: Int
+                    val upDownSensitivity: Int
+
+                    when(progress){
+                        0 -> {
+                            sideSensitivity = 4
+                            upDownSensitivity = 3
+                        }
+                        1 -> {
+                            sideSensitivity = 5
+                            upDownSensitivity = 4
+                        }
+                        2 -> {
+                            sideSensitivity = 5
+                            upDownSensitivity = 6
+                        }
+                        else -> {
+                            sideSensitivity = 5
+                            upDownSensitivity = 4
+                        }
+                    }
+                    accelerometerSensorEvent.updateSensitivity(sideSensitivity, upDownSensitivity)
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                }
+            })
+        }
     }
 
     private fun sendMediaKeyEvent(keyCode: Int) {
