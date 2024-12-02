@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Gesture Control</string>
+    
+    <string-array name="spinner_items">
+        <item>Media Next</item>
+        <item>Media Previous</item>
+        <item>Vol +</item>
+        <item>Vol -</item>
+    </string-array>
 </resources>

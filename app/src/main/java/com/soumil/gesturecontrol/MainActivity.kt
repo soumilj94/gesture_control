@@ -1,12 +1,21 @@
 package com.soumil.gesturecontrol
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.hardware.Sensor
+import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.SeekBar
+import android.widget.Spinner
 import androidx.activity.ComponentActivity
 import com.soumil.gesturecontrol.databinding.ActivityMainBinding
 import com.soumil.gesturecontrol.gestures.AccelerometerSensorEvent
@@ -42,6 +51,11 @@ class MainActivity : ComponentActivity() {
             ::adjustVolume
         )
 
+        val filter = IntentFilter("com.soumil.gesturecontrol.TILE_STATE_CHANGED")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(tileStateReceiver, filter, RECEIVER_EXPORTED)
+        }
+
         sensorManager.registerListener(
             proximitySensorEvent,
             proximitySensor,
@@ -65,7 +79,7 @@ class MainActivity : ComponentActivity() {
                     when(progress){
                         0 -> {
                             sideSensitivity = 4
-                            upDownSensitivity = 3
+                            upDownSensitivity = 2
                         }
                         1 -> {
                             sideSensitivity = 5
@@ -90,7 +104,62 @@ class MainActivity : ComponentActivity() {
                 }
             })
         }
+
+        val htrSpinner = findViewById<Spinner>(R.id.htrSpin)
+        val adapter = ArrayAdapter.createFromResource(this, R.array.spinner_items, android.R.layout.simple_spinner_item)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        htrSpinner.adapter = adapter
+
+        htrSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long){
+                val selectedItem = parent.getItemAtPosition(position) as String
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
     }
+
+    private val tileStateReceiver = object: BroadcastReceiver(){
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "com.soumil.gesturecontrol.TILE_STATE_CHANGED"){
+                val isActive = intent.getBooleanExtra("isActive", false)
+                if (isActive){
+                    registerAccelerometerSensor()
+                    registerProximitySensor()
+                }
+                else{
+                    unregisterAccelerometerSensor()
+                    unregisterProximitySensor()
+                }
+            }
+        }
+    }
+
+    private fun registerAccelerometerSensor() {
+        sensorManager.registerListener(
+            accelerometerSensorEvent,
+            accelerometerSensor,
+            SensorManager.SENSOR_DELAY_GAME,
+        )
+    }
+
+    private fun registerProximitySensor(){
+        sensorManager.registerListener(
+            proximitySensorEvent,
+            proximitySensor,
+            SensorManager.SENSOR_DELAY_GAME,
+        )
+    }
+
+    private fun unregisterAccelerometerSensor() {
+        sensorManager.unregisterListener(accelerometerSensorEvent)
+    }
+
+    private fun unregisterProximitySensor(){
+        sensorManager.unregisterListener(proximitySensorEvent)
+    }
+
 
     private fun sendMediaKeyEvent(keyCode: Int) {
         val keyEventDown = KeyEvent(KeyEvent.ACTION_DOWN, keyCode)
@@ -119,5 +188,23 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         sensorManager.unregisterListener(proximitySensorEvent)
         sensorManager.unregisterListener(accelerometerSensorEvent)
+
+        unregisterReceiver(tileStateReceiver)
+        unregisterAccelerometerSensor()
+        unregisterProximitySensor()
+    }
+
+    fun getSensorListener(sensor: Sensor): SensorEventListener? {
+        return when (sensor.type) {
+            Sensor.TYPE_PROXIMITY -> {
+                proximitySensorEvent // Return the registered listener for proximity sensor
+            }
+            Sensor.TYPE_ACCELEROMETER -> {
+                accelerometerSensorEvent // Return the registered listener for accelerometer
+            }
+            else -> {
+                null
+            }
+        }
     }
 }
